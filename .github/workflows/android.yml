@@ -26,13 +26,15 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      # 3. Grant execute permission for Gradle wrapper
-      - name: Grant Execute Permission for Gradlew
-        run: chmod +x gradlew
+      # 3. Setup Gradle (avoids requiring the wrapper script in repository)
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
 
       # 4. Build Debug APK
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: gradle assembleDebug
 
       # 5. Upload APK to GitHub Actions Build Artifacts
       - name: Upload APK Artifact
