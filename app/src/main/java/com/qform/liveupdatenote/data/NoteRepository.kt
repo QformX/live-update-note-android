@@ -29,4 +29,12 @@ class NoteRepository(private val noteDao: NoteDao) {
     suspend fun setActiveNote(id: Long?) {
         noteDao.setActiveNote(id)
     }
+
+    suspend fun incrementCurrentSteps(id: Long) {
+        noteDao.incrementCurrentSteps(id)
+    }
+
+    suspend fun resetCurrentSteps(id: Long) {
+        noteDao.resetCurrentSteps(id)
+    }
 }

@@ -24,11 +24,11 @@ import com.qform.liveupdatenote.ui.ThemeMode
 import com.qform.liveupdatenote.ui.NoteViewModel
 import com.qform.liveupdatenote.ui.NoteViewModelFactory
 import com.qform.liveupdatenote.ui.screens.MainScreen
-import com.qform.liveupdatenote.ui.theme.LiveUpdateNoteTheme
+import com.qform.liveupdatenote.ui.theme.LUNTheme
 import kotlinx.coroutines.launch
 
 /**
- * Main Activity of the Live Update Note app.
+ * Main Activity of the LUN app.
  * Configures compose, requests notifications permissions on Android 13+,
  * and automatically starts the Live Update Foreground Service if there is an active note.
  */
@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.DARK -> true
                 ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
             }
-            LiveUpdateNoteTheme(darkTheme = isDark) {
+            LUNTheme(darkTheme = isDark) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

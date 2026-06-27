@@ -9,11 +9,17 @@ import androidx.room.PrimaryKey
  * @property id Auto-generated unique identifier.
  * @property text The text content of the note.
  * @property isActive Flag indicating if this note is currently promoted to the Live Update notification.
+ * @property type The type of the note: "TEXT" or "HABIT".
+ * @property totalSteps Total progress steps required.
+ * @property currentSteps Current completed progress steps.
  */
 @Entity(tableName = "notes")
 data class Note(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val text: String,
-    val isActive: Boolean = false
+    val isActive: Boolean = false,
+    val type: String = "TEXT",
+    val totalSteps: Int = 1,
+    val currentSteps: Int = 0
 )

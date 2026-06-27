@@ -16,13 +16,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LiveUpdateNote"
+        android:theme="@style/Theme.LUN"
         tools:targetApi="31">
         
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.LiveUpdateNote"
+            android:theme="@style/Theme.LUN"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,6 +39,16 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Live Update status display for the currently active user note on lockscreen and status bar chip." />
         </service>
+
+        <!-- Broadcast Receiver for Habit Tracker Actions -->
+        <receiver
+            android:name=".service.HabitActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.qform.liveupdatenote.action.HABIT_INCREMENT" />
+                <action android:name="com.qform.liveupdatenote.action.HABIT_RESET" />
+            </intent-filter>
+        </receiver>
 
     </application>
 </manifest>

@@ -60,10 +60,28 @@ class NoteViewModel(
     /**
      * Inserts a new note into the Room database.
      */
-    fun insertNote(text: String) {
+    fun insertNote(text: String, type: String = "TEXT", totalSteps: Int = 1) {
         if (text.isBlank()) return
         viewModelScope.launch {
-            repository.insert(Note(text = text.trim()))
+            repository.insert(Note(text = text.trim(), type = type, totalSteps = totalSteps))
+        }
+    }
+
+    /**
+     * Increments the progress steps of a habit.
+     */
+    fun incrementSteps(note: Note) {
+        viewModelScope.launch {
+            repository.incrementCurrentSteps(note.id)
+        }
+    }
+
+    /**
+     * Resets the progress steps of a habit.
+     */
+    fun resetSteps(note: Note) {
+        viewModelScope.launch {
+            repository.resetCurrentSteps(note.id)
         }
     }
 

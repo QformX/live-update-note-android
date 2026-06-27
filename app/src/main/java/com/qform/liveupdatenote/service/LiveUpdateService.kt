@@ -182,19 +182,28 @@ class LiveUpdateService : Service() {
             pendingIntentFlags
         )
 
-        // 3. Action Button - "Deactivate" note directly from notification
-        val deactivateActionIntent = PendingIntent.getService(
-            this,
-            2,
-            Intent(this, LiveUpdateService::class.java).apply { action = ACTION_DEACTIVATE },
-            pendingIntentFlags
-        )
-
         // Create short preview for Android 16 Status Bar Chip (e.g., setShortCriticalText)
         val shortPreview = if (note.text.length > 15) {
             note.text.take(12) + "..."
         } else {
             note.text
+        }
+
+        val isHabit = note.type == "HABIT"
+
+        // Load active language preferences to localize notifications
+        val prefs = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        val isRu = (prefs.getString("language", "en") ?: "en") == "ru"
+
+        val formattedTitle = if (isHabit) note.text else "LUN"
+        val formattedText = if (isHabit) {
+            if (isRu) {
+                "Выполнено: ${note.currentSteps} из ${note.totalSteps}. Осталось: ${note.totalSteps - note.currentSteps}"
+            } else {
+                "Completed: ${note.currentSteps} of ${note.totalSteps}. Remaining: ${note.totalSteps - note.currentSteps}"
+            }
+        } else {
+            getFormattedLargeText(note.text)
         }
 
         // Build notification using Notification.Builder as required
@@ -210,13 +219,7 @@ class LiveUpdateService : Service() {
             putCharSequence("android.shortCriticalText", shortPreview)
         }
 
-        val formattedText = getFormattedLargeText(note.text)
-
-        val bigTextStyle = Notification.BigTextStyle()
-            .bigText(formattedText)
-            .setBigContentTitle("LUN")
-
-        builder.setContentTitle("LUN")
+        builder.setContentTitle(formattedTitle)
             .setContentText(formattedText)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(contentIntent)
@@ -228,8 +231,63 @@ class LiveUpdateService : Service() {
             .setPriority(Notification.PRIORITY_HIGH)
             .setCategory(Notification.CATEGORY_STATUS)
             .setOnlyAlertOnce(true)
-            .setStyle(bigTextStyle)
             .addExtras(extras)
+
+        if (isHabit) {
+            // Action Button 1: Increment steps (+1)
+            val incrementIntent = Intent(this, HabitActionReceiver::class.java).apply {
+                action = HabitActionReceiver.ACTION_INCREMENT
+                putExtra(HabitActionReceiver.EXTRA_NOTE_ID, note.id)
+            }
+            val incrementPendingIntent = PendingIntent.getBroadcast(
+                this,
+                101,
+                incrementIntent,
+                pendingIntentFlags
+            )
+            val incrementTitle = if (isRu) "🥛 +1" else "🥛 +1"
+            builder.addAction(
+                Notification.Action.Builder(
+                    android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_notification),
+                    incrementTitle,
+                    incrementPendingIntent
+                ).build()
+            )
+
+            // Action Button 2: Reset steps (0)
+            val resetIntent = Intent(this, HabitActionReceiver::class.java).apply {
+                action = HabitActionReceiver.ACTION_RESET
+                putExtra(HabitActionReceiver.EXTRA_NOTE_ID, note.id)
+            }
+            val resetPendingIntent = PendingIntent.getBroadcast(
+                this,
+                102,
+                resetIntent,
+                pendingIntentFlags
+            )
+            val resetTitle = if (isRu) "🔄 Сбросить" else "🔄 Reset"
+            builder.addAction(
+                Notification.Action.Builder(
+                    android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_notification),
+                    resetTitle,
+                    resetPendingIntent
+                ).build()
+            )
+
+            // Configure Android 16 ProgressStyle dynamically using reflection
+            applyHabitProgressStyle(builder, note)
+
+            // Fallback: traditional progress bar for Android < 16
+            if (Build.VERSION.SDK_INT < 36) {
+                builder.setProgress(note.totalSteps, note.currentSteps, false)
+            }
+        } else {
+            // Text Note Style
+            val bigTextStyle = Notification.BigTextStyle()
+                .bigText(formattedText)
+                .setBigContentTitle(formattedTitle)
+            builder.setStyle(bigTextStyle)
+        }
 
         // Apply Android 16 Live Update configurations via compatibility reflection
         applyLiveUpdateCompat(builder, shortPreview)
@@ -246,6 +304,61 @@ class LiveUpdateService : Service() {
             startForeground(NOTIFICATION_ID, notification, fgsType)
         } else {
             startForeground(NOTIFICATION_ID, notification)
+        }
+    }
+
+    /**
+     * Dynamically configures the Android 16+ Notification.ProgressStyle using reflection.
+     * This avoids compile-time failures on projects targeting older Android SDK compile versions (e.g. 35).
+     */
+    private fun applyHabitProgressStyle(builder: Notification.Builder, note: Note) {
+        if (Build.VERSION.SDK_INT >= 36) {
+            try {
+                // Get ProgressStyle class
+                val progressStyleClass = Class.forName("android.app.Notification\$ProgressStyle")
+                val progressStyle = progressStyleClass.getConstructor().newInstance()
+
+                // 1. Set progress: .setProgress(currentSteps * (1000 / totalSteps))
+                // Scale to 1000 for smooth progress tracking
+                val setProgressMethod = progressStyleClass.getMethod("setProgress", Int::class.javaPrimitiveType)
+                val totalProgress = 1000
+                val progressValue = if (note.totalSteps > 0) {
+                    (note.currentSteps.toFloat() / note.totalSteps * totalProgress).toInt()
+                } else {
+                    0
+                }
+                setProgressMethod.invoke(progressStyle, progressValue)
+
+                // 2. Set progress tracker icon: .setProgressTrackerIcon(Icon)
+                // Use R.drawable.ic_notification as tracker icon position indicator
+                val setProgressTrackerIconMethod = progressStyleClass.getMethod("setProgressTrackerIcon", android.graphics.drawable.Icon::class.java)
+                val trackerIcon = android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_notification)
+                setProgressTrackerIconMethod.invoke(progressStyle, trackerIcon)
+
+                // 3. Set segments: loop through total steps, active steps are colored, remaining are gray
+                val segmentClass = Class.forName("android.app.Notification\$ProgressStyle\$Segment")
+                val segmentConstructor = segmentClass.getConstructor(Int::class.javaPrimitiveType)
+                val setColorMethod = segmentClass.getMethod("setColor", Int::class.javaPrimitiveType)
+                val addProgressSegmentMethod = progressStyleClass.getMethod("addProgressSegment", segmentClass)
+
+                for (i in 0 until note.totalSteps) {
+                    // Active segments colored Green (0xFF4CAF50), inactive colored Gray (0xFF757575)
+                    val color = if (i < note.currentSteps) {
+                        0xFF4CAF50.toInt() // Completed accent color
+                    } else {
+                        0xFF757575.toInt() // Remaining neutral color
+                    }
+                    val segment = segmentConstructor.newInstance(100) // Equal weighting segments
+                    setColorMethod.invoke(segment, color)
+                    addProgressSegmentMethod.invoke(progressStyle, segment)
+                }
+
+                // 4. Attach progress style to notification builder: builder.setStyle(progressStyle)
+                val setStyleMethod = Notification.Builder::class.java.getMethod("setStyle", Class.forName("android.app.Notification\$Style"))
+                setStyleMethod.invoke(builder, progressStyle)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

@@ -36,6 +36,12 @@ interface NoteDao {
     @Query("UPDATE notes SET isActive = 1 WHERE id = :id")
     suspend fun activateNoteById(id: Long)
 
+    @Query("UPDATE notes SET currentSteps = MIN(totalSteps, currentSteps + 1) WHERE id = :id")
+    suspend fun incrementCurrentSteps(id: Long)
+
+    @Query("UPDATE notes SET currentSteps = 0 WHERE id = :id")
+    suspend fun resetCurrentSteps(id: Long)
+
     /**
      * Transaction to update the active note.
      * Only one note can be marked active. If [id] is null, all notes are deactivated.

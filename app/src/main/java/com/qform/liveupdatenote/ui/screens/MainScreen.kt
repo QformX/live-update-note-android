@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -57,6 +59,8 @@ fun MainScreen(
 
     var showAddDialog by remember { mutableStateOf(false) }
     var noteText by remember { mutableStateOf("") }
+    var noteType by remember { mutableStateOf("TEXT") }
+    var totalStepsStr by remember { mutableStateOf("1") }
     
     // Focus requester and keyboard summon logic
     val focusRequester = remember { FocusRequester() }
@@ -75,7 +79,7 @@ fun MainScreen(
                 title = {
                     Text(
                         text = if (currentTab == NavigationTab.NOTES) {
-                            if (isRu) "Заметки" else "Live Notes"
+                            if (isRu) "Заметки" else "LUN"
                         } else {
                             if (isRu) "Настройки" else "Settings"
                         },
@@ -275,8 +279,11 @@ fun MainScreen(
                                 NoteItemCard(
                                     note = note,
                                     isActive = note.isActive,
+                                    isRu = isRu,
                                     onToggleActive = { viewModel.toggleNoteActive(context, note) },
-                                    onDelete = { viewModel.deleteNote(note) }
+                                    onDelete = { viewModel.deleteNote(note) },
+                                    onIncrement = { viewModel.incrementSteps(note) },
+                                    onReset = { viewModel.resetSteps(note) }
                                 )
                             }
                         }
@@ -294,6 +301,8 @@ fun MainScreen(
         Dialog(onDismissRequest = {
             showAddDialog = false
             noteText = ""
+            noteType = "TEXT"
+            totalStepsStr = "1"
         }) {
             Card(
                 modifier = Modifier
@@ -311,27 +320,76 @@ fun MainScreen(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = if (isRu) "Создать заметку" else "Create Note",
+                        text = if (isRu) "Создать запись" else "Create Entry",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Toggle for Entry Type
+                    Text(
+                        text = if (isRu) "Тип записи" else "Entry Type",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = noteType == "TEXT",
+                            onClick = { noteType = "TEXT" },
+                            label = { Text(if (isRu) "Заметка" else "Text Note") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            selected = noteType == "HABIT",
+                            onClick = { noteType = "HABIT" },
+                            label = { Text(if (isRu) "Привычка" else "Habit Tracker") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     OutlinedTextField(
                         value = noteText,
                         onValueChange = { noteText = it },
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(focusRequester), // Focus request target
+                        label = { Text(if (isRu) "Название / Содержимое" else "Title / Content") },
                         placeholder = { Text(if (isRu) "Напишите ваши мысли..." else "Write your thoughts...") },
-                        maxLines = 6,
+                        maxLines = 4,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline
                         )
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (noteType == "HABIT") {
+                        OutlinedTextField(
+                            value = totalStepsStr,
+                            onValueChange = { newValue ->
+                                if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                                    totalStepsStr = newValue
+                                }
+                            },
+                            label = { Text(if (isRu) "Целевой прогресс (шагов)" else "Target Steps") },
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number
+                            ),
+                            shape = RoundedCornerShape(16.dp),
+                            singleLine = true
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
@@ -340,6 +398,8 @@ fun MainScreen(
                             onClick = {
                                 showAddDialog = false
                                 noteText = ""
+                                noteType = "TEXT"
+                                totalStepsStr = "1"
                             }
                         ) {
                             Text(if (isRu) "Отмена" else "Cancel", fontWeight = FontWeight.Bold)
@@ -348,9 +408,16 @@ fun MainScreen(
                         Button(
                             onClick = {
                                 if (noteText.isNotBlank()) {
-                                    viewModel.insertNote(noteText)
+                                    val totalSteps = totalStepsStr.toIntOrNull() ?: 1
+                                    viewModel.insertNote(
+                                        text = noteText,
+                                        type = noteType,
+                                        totalSteps = if (totalSteps > 0) totalSteps else 1
+                                    )
                                     showAddDialog = false
                                     noteText = ""
+                                    noteType = "TEXT"
+                                    totalStepsStr = "1"
                                 }
                             },
                             shape = RoundedCornerShape(12.dp)
@@ -368,8 +435,11 @@ fun MainScreen(
 fun NoteItemCard(
     note: Note,
     isActive: Boolean,
+    isRu: Boolean,
     onToggleActive: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onIncrement: () -> Unit,
+    onReset: () -> Unit
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = if (isActive) {
@@ -402,35 +472,110 @@ fun NoteItemCard(
             defaultElevation = if (isActive) 4.dp else 1.dp
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(20.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = note.text,
-                    style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = 22.sp,
-                    color = contentColor
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                ) {
+                    Text(
+                        text = note.text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 22.sp,
+                        color = contentColor
+                    )
+                }
+
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Note",
+                        tint = if (isActive) {
+                            MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        }
+                    )
+                }
             }
 
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Note",
-                    tint = if (isActive) {
-                        MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                    }
+            if (note.type == "HABIT") {
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                val progressText = if (isRu) {
+                    "Выполнено: ${note.currentSteps} из ${note.totalSteps}"
+                } else {
+                    "Progress: ${note.currentSteps} of ${note.totalSteps}"
+                }
+
+                Text(
+                    text = progressText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = contentColor.copy(alpha = 0.8f)
                 )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                val progressFraction = if (note.totalSteps > 0) {
+                    note.currentSteps.toFloat() / note.totalSteps
+                } else {
+                    0f
+                }
+
+                LinearProgressIndicator(
+                    progress = { progressFraction },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            // Prevent event propagation so clicking the button doesn't toggle active state of the note card
+                            onIncrement()
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(if (isRu) "🥛 +1 шаг" else "🥛 +1 Step", fontWeight = FontWeight.Bold)
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            // Prevent event propagation so clicking the button doesn't toggle active state of the note card
+                            onReset()
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = contentColor
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(if (isRu) "🔄 Сбросить" else "🔄 Reset", fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
     }
