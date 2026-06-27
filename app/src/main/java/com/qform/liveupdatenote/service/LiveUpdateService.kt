@@ -34,7 +34,7 @@ class LiveUpdateService : Service() {
 
     companion object {
         const val NOTIFICATION_ID = 9901
-        const val CHANNEL_ID = "live_update_note_channel_v3"
+        const val CHANNEL_ID = "live_update_note_channel_v4"
         
         const val ACTION_START = "com.qform.liveupdatenote.action.START"
         const val ACTION_DEACTIVATE = "com.qform.liveupdatenote.action.DEACTIVATE"
@@ -76,12 +76,18 @@ class LiveUpdateService : Service() {
             Notification.Builder(this)
         }
 
+        val extras = android.os.Bundle().apply {
+            putBoolean("android.requestPromotedOngoing", true)
+            putCharSequence("android.shortCriticalText", "Syncing...")
+        }
+
         builder.setContentTitle(getString(R.string.app_name))
             .setContentText("Active note loading...")
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setPriority(Notification.PRIORITY_HIGH)
+            .addExtras(extras)
 
         val notification = builder.build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -171,6 +177,11 @@ class LiveUpdateService : Service() {
             Notification.Builder(this)
         }
 
+        val extras = android.os.Bundle().apply {
+            putBoolean("android.requestPromotedOngoing", true)
+            putCharSequence("android.shortCriticalText", shortPreview)
+        }
+
         builder.setContentTitle(getString(R.string.app_name))
             .setContentText(note.text)
             .setSmallIcon(R.drawable.ic_notification)
@@ -181,6 +192,7 @@ class LiveUpdateService : Service() {
             .setWhen(System.currentTimeMillis())
             .setShowWhen(true)
             .setPriority(Notification.PRIORITY_HIGH)
+            .addExtras(extras)
 
         // Add explicit action button for deactivation
         val deactivateAction = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
