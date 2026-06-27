@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer note container -->
+    <path
+        android:fillColor="#FF7C4DFF"
+        android:pathData="M24,24h60v60h-60z"
+        android:fillType="nonZero"/>
+    <!-- Clipboard header / detail -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M34,34 h40 v8 h-40 z"/>
+    <!-- Note body lines -->
+    <path
+        android:fillColor="#B0BEC5"
+        android:pathData="M34,50 h40 v4 h-40 z M34,62 h30 v4 h-30 z"/>
+</vector>
