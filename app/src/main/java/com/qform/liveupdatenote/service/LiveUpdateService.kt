@@ -234,7 +234,7 @@ class LiveUpdateService : Service() {
             .addExtras(extras)
 
         if (isHabit) {
-            // Action Button 1: Increment steps (+1)
+            // Action Button 1: Increment steps
             val incrementIntent = Intent(this, HabitActionReceiver::class.java).apply {
                 action = HabitActionReceiver.ACTION_INCREMENT
                 putExtra(HabitActionReceiver.EXTRA_NOTE_ID, note.id)
@@ -245,7 +245,7 @@ class LiveUpdateService : Service() {
                 incrementIntent,
                 pendingIntentFlags
             )
-            val incrementTitle = if (isRu) "🥛 +1" else "🥛 +1"
+            val incrementTitle = if (isRu) "+ шаг" else "+ step"
             builder.addAction(
                 Notification.Action.Builder(
                     android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_notification),
@@ -265,7 +265,7 @@ class LiveUpdateService : Service() {
                 resetIntent,
                 pendingIntentFlags
             )
-            val resetTitle = if (isRu) "🔄 Сбросить" else "🔄 Reset"
+            val resetTitle = if (isRu) "сбросить" else "reset"
             builder.addAction(
                 Notification.Action.Builder(
                     android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_notification),
@@ -318,21 +318,20 @@ class LiveUpdateService : Service() {
                 val progressStyleClass = Class.forName("android.app.Notification\$ProgressStyle")
                 val progressStyle = progressStyleClass.getConstructor().newInstance()
 
-                // 1. Set progress: .setProgress(currentSteps * (1000 / totalSteps))
-                // Scale to 1000 for smooth progress tracking
+                // Call setStyledByProgress(false) as per best practices
+                val setStyledByProgressMethod = progressStyleClass.getMethod("setStyledByProgress", Boolean::class.javaPrimitiveType)
+                setStyledByProgressMethod.invoke(progressStyle, false)
+
+                // 1. Set progress: progress value should be currentSteps * segmentLength (100)
+                // This ensures the progress marker aligns perfectly with the segments and doesn't overshoot
                 val setProgressMethod = progressStyleClass.getMethod("setProgress", Int::class.javaPrimitiveType)
-                val totalProgress = 1000
-                val progressValue = if (note.totalSteps > 0) {
-                    (note.currentSteps.toFloat() / note.totalSteps * totalProgress).toInt()
-                } else {
-                    0
-                }
+                val progressValue = note.currentSteps * 100
                 setProgressMethod.invoke(progressStyle, progressValue)
 
                 // 2. Set progress tracker icon: .setProgressTrackerIcon(Icon)
-                // Use R.drawable.ic_notification as tracker icon position indicator
+                // Use R.drawable.ic_directions_run (running man vector icon) as the tracker icon
                 val setProgressTrackerIconMethod = progressStyleClass.getMethod("setProgressTrackerIcon", android.graphics.drawable.Icon::class.java)
-                val trackerIcon = android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_notification)
+                val trackerIcon = android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_directions_run)
                 setProgressTrackerIconMethod.invoke(progressStyle, trackerIcon)
 
                 // 3. Set segments: loop through total steps, active steps are colored, remaining are gray
@@ -348,7 +347,7 @@ class LiveUpdateService : Service() {
                     } else {
                         0xFF757575.toInt() // Remaining neutral color
                     }
-                    val segment = segmentConstructor.newInstance(100) // Equal weighting segments
+                    val segment = segmentConstructor.newInstance(100) // Equal weighting segments of length 100
                     setColorMethod.invoke(segment, color)
                     addProgressSegmentMethod.invoke(progressStyle, segment)
                 }

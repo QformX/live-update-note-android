@@ -15,12 +15,14 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -96,38 +98,91 @@ fun MainScreen(
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
                 tonalElevation = 8.dp,
-                modifier = Modifier.height(64.dp)
+                modifier = Modifier.height(68.dp)
             ) {
                 NavigationBarItem(
                     selected = currentTab == NavigationTab.NOTES,
                     onClick = { currentTab = NavigationTab.NOTES },
-                    icon = { Icon(Icons.Default.List, contentDescription = "Notes") },
-                    label = { Text(if (isRu) "Заметки" else "Notes", fontWeight = FontWeight.Bold) }
+                    icon = { Icon(Icons.Default.List, contentDescription = "Notes") }
                 )
                 NavigationBarItem(
                     selected = currentTab == NavigationTab.SETTINGS,
                     onClick = { currentTab = NavigationTab.SETTINGS },
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                    label = { Text(if (isRu) "Настройки" else "Settings", fontWeight = FontWeight.Bold) }
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") }
                 )
             }
         },
         floatingActionButton = {
             if (currentTab == NavigationTab.NOTES) {
-                // Simple plus (+) in a circle FAB
-                FloatingActionButton(
-                    onClick = { showAddDialog = true },
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    elevation = FloatingActionButtonDefaults.elevation(8.dp),
-                    modifier = Modifier.size(84.dp)
+                var isFabExpanded by remember { mutableStateOf(false) }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add, 
-                        contentDescription = if (isRu) "Добавить заметку" else "Add Note",
-                        modifier = Modifier.size(42.dp)
-                    )
+                    // Mini FAB for Habit Tracker (only visible when expanded)
+                    AnimatedVisibility(
+                        visible = isFabExpanded,
+                        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(expandFrom = Alignment.Bottom),
+                        exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically(shrinkTowards = Alignment.Bottom)
+                    ) {
+                        SmallFloatingActionButton(
+                            onClick = {
+                                isFabExpanded = false
+                                noteType = "HABIT"
+                                showAddDialog = true
+                            },
+                            shape = CircleShape,
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            modifier = Modifier.size(56.dp)
+                        ) {
+                            Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(28.dp))
+                        }
+                    }
+
+                    // Mini FAB for Regular Note (only visible when expanded)
+                    AnimatedVisibility(
+                        visible = isFabExpanded,
+                        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(expandFrom = Alignment.Bottom),
+                        exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically(shrinkTowards = Alignment.Bottom)
+                    ) {
+                        SmallFloatingActionButton(
+                            onClick = {
+                                isFabExpanded = false
+                                noteType = "TEXT"
+                                showAddDialog = true
+                            },
+                            shape = CircleShape,
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            modifier = Modifier.size(56.dp)
+                        ) {
+                            Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(28.dp))
+                        }
+                    }
+
+                    // Main FAB
+                    FloatingActionButton(
+                        onClick = { isFabExpanded = !isFabExpanded },
+                        shape = CircleShape,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp),
+                        modifier = Modifier.size(84.dp)
+                    ) {
+                        val rotationAngle by androidx.compose.animation.core.animateFloatAsState(
+                            targetValue = if (isFabExpanded) 45f else 0f,
+                            label = "fab_rotation"
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Add, 
+                            contentDescription = if (isRu) "Добавить" else "Add",
+                            modifier = Modifier
+                                .size(42.dp)
+                                .graphicsLayer(rotationZ = rotationAngle)
+                        )
+                    }
                 }
             }
         }
@@ -320,38 +375,15 @@ fun MainScreen(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = if (isRu) "Создать запись" else "Create Entry",
+                        text = if (noteType == "HABIT") {
+                            if (isRu) "Новый трекер привычек" else "New Habit Tracker"
+                        } else {
+                            if (isRu) "Новая заметка" else "New Note"
+                        },
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Toggle for Entry Type
-                    Text(
-                        text = if (isRu) "Тип записи" else "Entry Type",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        FilterChip(
-                            selected = noteType == "TEXT",
-                            onClick = { noteType = "TEXT" },
-                            label = { Text(if (isRu) "Заметка" else "Text Note") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        FilterChip(
-                            selected = noteType == "HABIT",
-                            onClick = { noteType = "HABIT" },
-                            label = { Text(if (isRu) "Привычка" else "Habit Tracker") },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedTextField(
@@ -360,8 +392,24 @@ fun MainScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(focusRequester), // Focus request target
-                        label = { Text(if (isRu) "Название / Содержимое" else "Title / Content") },
-                        placeholder = { Text(if (isRu) "Напишите ваши мысли..." else "Write your thoughts...") },
+                        label = {
+                            Text(
+                                if (noteType == "HABIT") {
+                                    if (isRu) "Название привычки" else "Habit Name"
+                                } else {
+                                    if (isRu) "Текст заметки" else "Note Content"
+                                }
+                            )
+                        },
+                        placeholder = {
+                            Text(
+                                if (noteType == "HABIT") {
+                                    if (isRu) "Например: Пить воду" else "e.g., Drink water"
+                                } else {
+                                    if (isRu) "Напишите ваши мысли..." else "Write your thoughts..."
+                                }
+                            )
+                        },
                         maxLines = 4,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -559,7 +607,7 @@ fun NoteItemCard(
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(if (isRu) "🥛 +1 шаг" else "🥛 +1 Step", fontWeight = FontWeight.Bold)
+                        Text(if (isRu) "+ шаг" else "+ step", fontWeight = FontWeight.Bold)
                     }
 
                     OutlinedButton(
@@ -573,7 +621,7 @@ fun NoteItemCard(
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(if (isRu) "🔄 Сбросить" else "🔄 Reset", fontWeight = FontWeight.Bold)
+                        Text(if (isRu) "сбросить" else "reset", fontWeight = FontWeight.Bold)
                     }
                 }
             }
