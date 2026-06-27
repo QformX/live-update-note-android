@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="190dp"
+    android:height="110dp"
+    android:viewportWidth="950"
+    android:viewportHeight="550">
+
+    <!-- Base dark shadow -->
+    <path
+        android:fillColor="#1D212A"
+        android:pathData="M 87,115 h 446 a 12,12 0 0 1 12,12 v 276 a 12,12 0 0 1 -12,12 h -446 a 12,12 0 0 1 -12,-12 v -276 a 12,12 0 0 1 12,-12 Z" />
+    <path
+        android:fillColor="#1D212A"
+        android:pathData="M 530,115 L 740,140 C 785,145 825,175 835,220 L 840,265 L 840,285 L 835,330 C 825,375 785,405 740,410 L 530,435 Z" />
+
+    <!-- Cargo Box -->
+    <path
+        android:fillColor="#BDC5CD"
+        android:strokeColor="#262B35"
+        android:strokeWidth="6"
+        android:strokeLineJoin="round"
+        android:pathData="M 90,120 h 445 a 10,10 0 0 1 10,10 v 270 a 10,10 0 0 1 -10,10 h -445 a 10,10 0 0 1 -10,-10 v -270 a 10,10 0 0 1 10,-10 Z" />
+
+    <!-- Cargo Borders -->
+    <path
+        android:fillColor="#A9B2BC"
+        android:fillAlpha="0.5"
+        android:pathData="M 80,120 L 110,120 L 110,410 L 80,410 Z M 80,120 L 545,120 L 545,140 L 80,140 Z M 80,390 L 545,390 L 545,410 L 80,410 Z M 525,120 L 545,120 L 545,410 L 525,410 Z" />
+
+    <!-- Rivets (solid fallback - VectorDrawable doesn't support strokeDashArray) -->
+    <path
+        android:strokeColor="#F0F2F5"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.7"
+        android:pathData="M 95,130 L 530,130 M 95,400 L 530,400 M 95,130 L 95,400 M 535,130 L 535,400" />
+
+    <!-- Left Cargo Door -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#262B35"
+        android:strokeWidth="3"
+        android:pathData="M 123,195 h 69 a 8,8 0 0 1 8,8 v 144 a 8,8 0 0 1 -8,8 h -69 a 8,8 0 0 1 -8,-8 v -144 a 8,8 0 0 1 8,-8 Z" />
+    <path
+        android:fillColor="#A9B2BC"
+        android:fillAlpha="0.3"
+        android:pathData="M 125,200 h 65 a 5,5 0 0 1 5,5 v 140 a 5,5 0 0 1 -5,5 h -65 a 5,5 0 0 1 -5,-5 v -140 a 5,5 0 0 1 5,-5 Z" />
+    <path
+        android:fillColor="#262B35"
+        android:pathData="M 128,265 h 9 a 3,3 0 0 1 3,3 v 24 a 3,3 0 0 1 -3,3 h -9 a 3,3 0 0 1 -3,-3 v -24 a 3,3 0 0 1 3,-3 Z" />
+
+    <!-- License Plate -->
+    <path
+        android:fillColor="#909AA3"
+        android:strokeColor="#262B35"
+        android:strokeWidth="2"
+        android:pathData="M 124,150 h 57 a 4,4 0 0 1 4,4 v 27 a 4,4 0 0 1 -4,4 h -57 a 4,4 0 0 1 -4,-4 v -27 a 4,4 0 0 1 4,-4 Z" />
+    <path
+        android:strokeColor="#262B35"
+        android:strokeWidth="2"
+        android:pathData="M 145,158 L 175,158" />
+    <path
+        android:strokeColor="#262B35"
+        android:strokeWidth="2"
+        android:pathData="M 145,166 L 175,166" />
+    <path
+        android:fillColor="#262B35"
+        android:pathData="M 132,161 a 6,6 0 1,1 0,12 a 6,6 0 1,1 0,-12 Z" />
+
+    <!-- Cargo Vertical Ridges -->
+    <path
+        android:fillColor="#A1AAB4"
+        android:strokeColor="#8F99A5"
+        android:strokeWidth="2"
+        android:pathData="M 241,150 h 4 a 6,6 0 0 1 6,6 v 218 a 6,6 0 0 1 -6,6 h -4 a 6,6 0 0 1 -6,-6 v -218 a 6,6 0 0 1 6,-6 Z" />
+    <path
+        android:fillColor="#A1AAB4"
+        android:strokeColor="#8F99A5"
+        android:strokeWidth="2"
+        android:pathData="M 321,150 h 4 a 6,6 0 0 1 6,6 v 218 a 6,6 0 0 1 -6,6 h -4 a 6,6 0 0 1 -6,-6 v -218 a 6,6 0 0 1 6,-6 Z" />
+    <path
+        android:fillColor="#A1AAB4"
+        android:strokeColor="#8F99A5"
+        android:strokeWidth="2"
+        android:pathData="M 401,150 h 4 a 6,6 0 0 1 6,6 v 218 a 6,6 0 0 1 -6,6 h -4 a 6,6 0 0 1 -6,-6 v -218 a 6,6 0 0 1 6,-6 Z" />
+    <path
+        android:fillColor="#A1AAB4"
+        android:strokeColor="#8F99A5"
+        android:strokeWidth="2"
+        android:pathData="M 481,150 h 4 a 6,6 0 0 1 6,6 v 218 a 6,6 0 0 1 -6,6 h -4 a 6,6 0 0 1 -6,-6 v -218 a 6,6 0 0 1 6,-6 Z" />
+
+    <!-- Red Cab -->
+    <path
+        android:fillColor="#DF3B43"
+        android:strokeColor="#262B35"
+        android:strokeWidth="6"
+        android:strokeLineJoin="round"
+        android:pathData="M 545,125 L 735,145 C 780,150 810,180 820,220 L 825,265 L 825,285 L 820,330 C 810,370 780,400 735,405 L 545,425 Z" />
+    <path
+        android:fillColor="#B1252C"
+        android:pathData="M 545,125 L 650,135 L 650,415 L 545,425 Z" />
+
+    <!-- Windshield -->
+    <path
+        android:fillColor="#2B3D5C"
+        android:strokeColor="#262B35"
+        android:strokeWidth="5"
+        android:pathData="M 580,190 h 55 a 10,10 0 0 1 10,10 v 150 a 10,10 0 0 1 -10,10 h -55 a 10,10 0 0 1 -10,-10 v -150 a 10,10 0 0 1 10,-10 Z" />
+    <path
+        android:fillColor="#1A263B"
+        android:pathData="M 575,195 L 640,195 L 640,355 C 600,355 580,315 575,265 Z" />
+
+    <!-- Side Window -->
+    <path
+        android:fillColor="#2B3D5C"
+        android:strokeColor="#262B35"
+        android:strokeWidth="5"
+        android:pathData="M 660,152 L 730,160 C 740,162 746,172 748,182 L 748,368 C 746,378 740,388 730,390 L 660,398 Z" />
+    <path
+        android:fillColor="#1A263B"
+        android:pathData="M 667,158 L 725,165 C 733,167 737,174 739,182 L 739,368 C 735,373 725,378 710,379 Z" />
+    <path
+        android:strokeColor="#262B35"
+        android:strokeWidth="3"
+        android:pathData="M 720,210 L 725,290" />
+
+    <!-- Trim Details -->
+    <group android:rotation="-10" android:pivotX="755" android:pivotY="175">
+        <path
+            android:fillColor="#262B35"
+            android:pathData="M 758,175 h 6 a 3,3 0 0 1 3,3 v 49 a 3,3 0 0 1 -3,3 h -6 a 3,3 0 0 1 -3,-3 v -49 a 3,3 0 0 1 3,-3 Z" />
+    </group>
+    <group android:rotation="10" android:pivotX="755" android:pivotY="320">
+        <path
+            android:fillColor="#262B35"
+            android:pathData="M 758,320 h 6 a 3,3 0 0 1 3,3 v 49 a 3,3 0 0 1 -3,3 h -6 a 3,3 0 0 1 -3,-3 v -49 a 3,3 0 0 1 3,-3 Z" />
+    </group>
+
+    <!-- Headlights -->
+    <path
+        android:fillColor="#EAEAEA"
+        android:strokeColor="#262B35"
+        android:strokeWidth="4"
+        android:pathData="M 780,154 C 800,157 812,177 818,197 C 810,187 800,172 780,167 Z" />
+    <path
+        android:fillColor="#EAEAEA"
+        android:strokeColor="#262B35"
+        android:strokeWidth="4"
+        android:pathData="M 780,396 C 800,393 812,373 818,353 C 810,363 800,378 780,383 Z" />
+
+    <!-- Mirrors -->
+    <path
+        android:fillColor="#DF3B43"
+        android:strokeColor="#262B35"
+        android:strokeWidth="4"
+        android:pathData="M 698,147 L 712,105 C 713,100 698,90 688,90 C 678,90 673,100 678,110 Z" />
+    <path
+        android:strokeColor="#262B35"
+        android:strokeWidth="5"
+        android:fillColor="#00000000"
+        android:pathData="M 655,148 C 660,140 680,123 692,120" />
+    <path
+        android:fillColor="#DF3B43"
+        android:strokeColor="#262B35"
+        android:strokeWidth="4"
+        android:pathData="M 698,403 L 712,445 C 713,450 698,460 688,460 C 678,460 673,450 678,440 Z" />
+    <path
+        android:strokeColor="#262B35"
+        android:strokeWidth="5"
+        android:fillColor="#00000000"
+        android:pathData="M 655,402 C 660,410 680,427 692,430" />
+
+    <!-- Back Mudflaps -->
+    <path
+        android:fillColor="#1D212A"
+        android:pathData="M 74,145 h 4 a 2,2 0 0 1 2,2 v 41 a 2,2 0 0 1 -2,2 h -4 a 2,2 0 0 1 -2,-2 v -41 a 2,2 0 0 1 2,-2 Z" />
+    <path
+        android:fillColor="#1D212A"
+        android:pathData="M 74,360 h 4 a 2,2 0 0 1 2,2 v 41 a 2,2 0 0 1 -2,2 h -4 a 2,2 0 0 1 -2,-2 v -41 a 2,2 0 0 1 2,-2 Z" />
+</vector>

@@ -322,16 +322,23 @@ class LiveUpdateService : Service() {
                 val setStyledByProgressMethod = progressStyleClass.getMethod("setStyledByProgress", Boolean::class.javaPrimitiveType)
                 setStyledByProgressMethod.invoke(progressStyle, false)
 
-                // 1. Set progress: progress value should be currentSteps * segmentLength (100)
-                // This ensures the progress marker aligns perfectly with the segments and doesn't overshoot
+                // 1. Calculate segment weights dynamically to compensate for rounded caps on first and last segments
+                val totalSteps = if (note.totalSteps > 0) note.totalSteps else 1
+                val weights = IntArray(totalSteps) { 100 }
+                if (totalSteps > 2) {
+                    weights[0] = 70
+                    weights[totalSteps - 1] = 70
+                }
+
+                // Progress value is the sum of weights of completed segments (so the indicator aligns exactly)
+                val progressValue = weights.take(note.currentSteps).sum()
+
                 val setProgressMethod = progressStyleClass.getMethod("setProgress", Int::class.javaPrimitiveType)
-                val progressValue = note.currentSteps * 100
                 setProgressMethod.invoke(progressStyle, progressValue)
 
                 // 2. Set progress tracker icon: .setProgressTrackerIcon(Icon)
-                // Use R.drawable.ic_f1_car (F1 Car vector icon) as the tracker icon
                 val setProgressTrackerIconMethod = progressStyleClass.getMethod("setProgressTrackerIcon", android.graphics.drawable.Icon::class.java)
-                val trackerIcon = android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_f1_car)
+                val trackerIcon = android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_delivery_truck)
                 setProgressTrackerIconMethod.invoke(progressStyle, trackerIcon)
 
                 // 3. Set segments: loop through total steps, active steps are colored, remaining are gray
@@ -352,9 +359,9 @@ class LiveUpdateService : Service() {
                     0xFF757575.toInt() // fallback gray
                 }
 
-                for (i in 0 until note.totalSteps) {
+                for (i in 0 until totalSteps) {
                     val color = if (i < note.currentSteps) activeColor else inactiveColor
-                    val segment = segmentConstructor.newInstance(100) // Equal weighting segments of length 100
+                    val segment = segmentConstructor.newInstance(weights[i])
                     setColorMethod.invoke(segment, color)
                     addProgressSegmentMethod.invoke(progressStyle, segment)
                 }
