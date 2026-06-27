@@ -40,6 +40,8 @@ class LiveUpdateService : Service() {
         const val ACTION_DEACTIVATE = "com.qform.liveupdatenote.action.DEACTIVATE"
     }
 
+    private var hasBeenActivated = false
+
     override fun onCreate() {
         super.onCreate()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -47,6 +49,7 @@ class LiveUpdateService : Service() {
         repository = NoteRepository(database.noteDao)
         
         createNotificationChannel()
+        showPlaceholderNotification() // Call startForeground synchronously to satisfy Android OS requirements
         observeActiveNote()
     }
 
@@ -65,17 +68,57 @@ class LiveUpdateService : Service() {
         return START_STICKY
     }
 
+    private fun showPlaceholderNotification() {
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(this, CHANNEL_ID)
+        } else {
+            @Suppress("DEPRECATION")
+            Notification.Builder(this)
+        }
+
+        builder.setContentTitle(getString(R.string.app_name))
+            .setContentText("Active note loading...")
+            .setSmallIcon(R.drawable.ic_notification)
+            .setOngoing(true)
+            .setVisibility(Notification.VISIBILITY_PUBLIC)
+
+        val notification = builder.build()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val fgsType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            } else {
+                0
+            }
+            startForeground(NOTIFICATION_ID, notification, fgsType)
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
+    }
+
     private fun observeActiveNote() {
         serviceScope.launch {
             repository.activeNote
                 .distinctUntilChanged()
                 .collect { activeNote ->
                     if (activeNote != null) {
+                        hasBeenActivated = true
                         updateNotification(activeNote)
                     } else {
-                        // No active note, remove foreground status and stop service
-                        stopForegroundCompat()
-                        stopSelf()
+                        if (hasBeenActivated) {
+                            // User explicitly deactivated the active note, shut down service cleanly
+                            stopForegroundCompat()
+                            stopSelf()
+                        } else {
+                            // First emission is null. Double check directly in database to make sure it's not a race
+                            val directActive = repository.getActiveNoteDirect()
+                            if (directActive == null) {
+                                stopForegroundCompat()
+                                stopSelf()
+                            } else {
+                                hasBeenActivated = true
+                                updateNotification(directActive)
+                            }
+                        }
                     }
                 }
         }
