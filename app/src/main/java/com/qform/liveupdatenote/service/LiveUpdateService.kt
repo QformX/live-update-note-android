@@ -34,7 +34,7 @@ class LiveUpdateService : Service() {
 
     companion object {
         const val NOTIFICATION_ID = 9901
-        const val CHANNEL_ID = "live_update_note_channel_v4"
+        const val CHANNEL_ID = "live_update_note_channel_v5"
         
         const val ACTION_START = "com.qform.liveupdatenote.action.START"
         const val ACTION_DEACTIVATE = "com.qform.liveupdatenote.action.DEACTIVATE"
@@ -81,12 +81,19 @@ class LiveUpdateService : Service() {
             putCharSequence("android.shortCriticalText", "Syncing...")
         }
 
+        val bigText = "Active note loading..."
+        val bigTextStyle = Notification.BigTextStyle()
+            .bigText(bigText)
+            .setBigContentTitle(getString(R.string.app_name))
+
         builder.setContentTitle(getString(R.string.app_name))
-            .setContentText("Active note loading...")
+            .setContentText(bigText)
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setPriority(Notification.PRIORITY_HIGH)
+            .setCategory(Notification.CATEGORY_STATUS)
+            .setStyle(bigTextStyle)
             .addExtras(extras)
 
         val notification = builder.build()
@@ -182,6 +189,10 @@ class LiveUpdateService : Service() {
             putCharSequence("android.shortCriticalText", shortPreview)
         }
 
+        val bigTextStyle = Notification.BigTextStyle()
+            .bigText(note.text)
+            .setBigContentTitle(getString(R.string.app_name))
+
         builder.setContentTitle(getString(R.string.app_name))
             .setContentText(note.text)
             .setSmallIcon(R.drawable.ic_notification)
@@ -192,6 +203,9 @@ class LiveUpdateService : Service() {
             .setWhen(System.currentTimeMillis())
             .setShowWhen(true)
             .setPriority(Notification.PRIORITY_HIGH)
+            .setCategory(Notification.CATEGORY_STATUS)
+            .setOnlyAlertOnce(true)
+            .setStyle(bigTextStyle)
             .addExtras(extras)
 
         // Add explicit action button for deactivation
@@ -263,6 +277,8 @@ class LiveUpdateService : Service() {
             ).apply {
                 description = getString(R.string.notification_channel_description)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                enableLights(true)
+                enableVibration(true)
             }
             notificationManager.createNotificationChannel(channel)
         }

@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
 
     // Compose state to track permission
     private var hasNotificationPermission by mutableStateOf(false)
+    private var isLiveUpdatesPromotedEnabled by mutableStateOf(true)
 
     // Standard Android Activity Launcher for permission requests
     private val requestPermissionLauncher = registerForActivityResult(
@@ -53,6 +54,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         checkNotificationPermission()
+        checkLiveUpdatesPromotionEnabled()
 
         // Check if there is an active note in the local database on startup.
         // If so, restore the Live Update foreground notification immediately.
@@ -72,9 +74,26 @@ class MainActivity : ComponentActivity() {
                     MainScreen(
                         viewModel = viewModel,
                         hasNotificationPermission = hasNotificationPermission,
+                        isLiveUpdatesPromotedEnabled = isLiveUpdatesPromotedEnabled,
                         onRequestPermission = {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        },
+                        onOpenPromotionSettings = {
+                            try {
+                                val intent = android.content.Intent("android.settings.APP_NOTIFICATION_PROMOTION_SETTINGS").apply {
+                                    putExtra("android.provider.extra.APP_PACKAGE", packageName)
+                                }
+                                startActivity(intent)
+                            } catch (e: Exception) {
+                                // Fallback to main settings if the promotion settings screen isn't found
+                                try {
+                                    val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = android.net.Uri.fromParts("package", packageName, null)
+                                    }
+                                    startActivity(intent)
+                                } catch (ex: Exception) {}
                             }
                         }
                     )
@@ -87,6 +106,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         // Re-check permission if user returns from settings
         checkNotificationPermission()
+        checkLiveUpdatesPromotionEnabled()
     }
 
     private fun checkNotificationPermission() {
@@ -95,6 +115,20 @@ class MainActivity : ComponentActivity() {
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    private fun checkLiveUpdatesPromotionEnabled() {
+        isLiveUpdatesPromotedEnabled = if (Build.VERSION.SDK_INT >= 36) {
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+            try {
+                val method = android.app.NotificationManager::class.java.getMethod("canPostPromotedNotifications")
+                method.invoke(notificationManager) as Boolean
+            } catch (e: Exception) {
+                true
+            }
         } else {
             true
         }

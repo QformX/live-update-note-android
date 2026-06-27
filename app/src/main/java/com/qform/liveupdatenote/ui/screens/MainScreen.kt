@@ -37,7 +37,9 @@ enum class NavigationTab {
 fun MainScreen(
     viewModel: NoteViewModel,
     hasNotificationPermission: Boolean,
-    onRequestPermission: () -> Unit
+    isLiveUpdatesPromotedEnabled: Boolean,
+    onRequestPermission: () -> Unit,
+    onOpenPromotionSettings: () -> Unit
 ) {
     val context = LocalContext.current
     var currentTab by remember { mutableStateOf(NavigationTab.NOTES) }
@@ -121,7 +123,7 @@ fun MainScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 16.dp),
+                                .padding(bottom = 12.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer
                             ),
@@ -162,6 +164,57 @@ fun MainScreen(
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
                                     Text("Allow", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+
+                    // Android 16 Promoted Live Updates warning banner
+                    if (!isLiveUpdatesPromotedEnabled) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                            ),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Live Updates Disabled",
+                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Live Updates Disabled",
+                                        fontWeight = FontWeight.Bold,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                    Text(
+                                        text = "Live Update system promotion is disabled. Enable it in settings to show status chips and AOD notes.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = onOpenPromotionSettings,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.tertiary,
+                                        contentColor = MaterialTheme.colorScheme.onTertiary
+                                    ),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Enable", fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
