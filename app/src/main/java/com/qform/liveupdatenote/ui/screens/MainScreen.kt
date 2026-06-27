@@ -71,7 +71,7 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            LargeTopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = if (currentTab == NavigationTab.NOTES) {
@@ -80,10 +80,10 @@ fun MainScreen(
                             if (isRu) "Настройки" else "Settings"
                         },
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = 32.sp
+                        fontSize = 28.sp
                     )
                 },
-                colors = TopAppBarDefaults.largeTopAppBarColors(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
@@ -91,7 +91,8 @@ fun MainScreen(
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
+                tonalElevation = 8.dp,
+                modifier = Modifier.height(64.dp)
             ) {
                 NavigationBarItem(
                     selected = currentTab == NavigationTab.NOTES,
@@ -115,12 +116,13 @@ fun MainScreen(
                     shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    elevation = FloatingActionButtonDefaults.elevation(8.dp),
+                    modifier = Modifier.size(84.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add, 
                         contentDescription = if (isRu) "Добавить заметку" else "Add Note",
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(42.dp)
                     )
                 }
             }
@@ -258,13 +260,6 @@ fun MainScreen(
                                     fontWeight = FontWeight.Bold,
                                     style = MaterialTheme.typography.titleLarge,
                                     textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = if (isRu) "Нажмите на круглую кнопку + внизу, чтобы добавить первую заметку." else "Tap the circular + button below to add your first note.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.bodyMedium
                                 )
                             }
                         }
