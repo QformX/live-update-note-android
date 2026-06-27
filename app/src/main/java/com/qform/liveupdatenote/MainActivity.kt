@@ -19,6 +19,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.qform.liveupdatenote.data.NoteDatabase
 import com.qform.liveupdatenote.data.NoteRepository
+import androidx.compose.runtime.collectAsState
+import com.qform.liveupdatenote.ui.ThemeMode
 import com.qform.liveupdatenote.ui.NoteViewModel
 import com.qform.liveupdatenote.ui.NoteViewModelFactory
 import com.qform.liveupdatenote.ui.screens.MainScreen
@@ -69,11 +71,11 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val themeMode by androidx.compose.runtime.collectAsState(viewModel.themeMode.value)
+            val themeMode by viewModel.themeMode.collectAsState()
             val isDark = when (themeMode) {
-                ui.ThemeMode.LIGHT -> false
-                ui.ThemeMode.DARK -> true
-                ui.ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
             }
             LiveUpdateNoteTheme(darkTheme = isDark) {
                 Surface(

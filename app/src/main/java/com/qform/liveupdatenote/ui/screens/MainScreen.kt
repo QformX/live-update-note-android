@@ -609,7 +609,7 @@ fun SettingsScreen(
 
                 ListItem(
                     headlineContent = { Text(if (isRu) "Версия" else "Version", fontWeight = FontWeight.Bold) },
-                    supportingContent = { Text("1.0.0 (API 35/36 Live Updates)") },
+                    supportingContent = { Text("1.1.0 (API 35/36 Live Updates)") },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
 
