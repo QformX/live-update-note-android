@@ -34,7 +34,7 @@ class LiveUpdateService : Service() {
 
     companion object {
         const val NOTIFICATION_ID = 9901
-        const val CHANNEL_ID = "live_update_note_channel"
+        const val CHANNEL_ID = "live_update_note_channel_v3"
         
         const val ACTION_START = "com.qform.liveupdatenote.action.START"
         const val ACTION_DEACTIVATE = "com.qform.liveupdatenote.action.DEACTIVATE"
@@ -81,6 +81,7 @@ class LiveUpdateService : Service() {
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setPriority(Notification.PRIORITY_HIGH)
 
         val notification = builder.build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -179,6 +180,7 @@ class LiveUpdateService : Service() {
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setWhen(System.currentTimeMillis())
             .setShowWhen(true)
+            .setPriority(Notification.PRIORITY_HIGH)
 
         // Add explicit action button for deactivation
         val deactivateAction = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -245,7 +247,7 @@ class LiveUpdateService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 getString(R.string.notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = getString(R.string.notification_channel_description)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
