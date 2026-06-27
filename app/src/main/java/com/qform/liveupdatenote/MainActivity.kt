@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
     private val repository by lazy { NoteRepository(database.noteDao) }
 
     private val viewModel: NoteViewModel by viewModels {
-        NoteViewModelFactory(repository)
+        NoteViewModelFactory(application, repository)
     }
 
     // Compose state to track permission
@@ -53,6 +53,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Apply saved locale configuration on startup
+        viewModel.applyLocale(this, viewModel.language.value)
+
         checkNotificationPermission()
         checkLiveUpdatesPromotionEnabled()
 
@@ -66,7 +69,13 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            LiveUpdateNoteTheme {
+            val themeMode by androidx.compose.runtime.collectAsState(viewModel.themeMode.value)
+            val isDark = when (themeMode) {
+                ui.ThemeMode.LIGHT -> false
+                ui.ThemeMode.DARK -> true
+                ui.ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
+            }
+            LiveUpdateNoteTheme(darkTheme = isDark) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

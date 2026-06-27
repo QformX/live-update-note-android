@@ -34,7 +34,7 @@ class LiveUpdateService : Service() {
 
     companion object {
         const val NOTIFICATION_ID = 9901
-        const val CHANNEL_ID = "live_update_note_channel_v5"
+        const val CHANNEL_ID = "live_update_note_channel_v6"
         
         const val ACTION_START = "com.qform.liveupdatenote.action.START"
         const val ACTION_DEACTIVATE = "com.qform.liveupdatenote.action.DEACTIVATE"
@@ -81,13 +81,15 @@ class LiveUpdateService : Service() {
             putCharSequence("android.shortCriticalText", "Syncing...")
         }
 
-        val bigText = "Active note loading..."
+        val rawText = "Active note loading..."
+        val formattedText = getFormattedLargeText(rawText)
+        
         val bigTextStyle = Notification.BigTextStyle()
-            .bigText(bigText)
-            .setBigContentTitle(getString(R.string.app_name))
+            .bigText(formattedText)
+            .setBigContentTitle("LUN")
 
-        builder.setContentTitle(getString(R.string.app_name))
-            .setContentText(bigText)
+        builder.setContentTitle("LUN")
+            .setContentText(formattedText)
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
@@ -107,6 +109,25 @@ class LiveUpdateService : Service() {
         } else {
             startForeground(NOTIFICATION_ID, notification)
         }
+    }
+
+    private fun getFormattedLargeText(text: String): CharSequence {
+        val spannable = android.text.SpannableString(text)
+        // 1.25x larger text size
+        spannable.setSpan(
+            android.text.style.RelativeSizeSpan(1.25f),
+            0,
+            text.length,
+            android.text.SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        // Bold styling
+        spannable.setSpan(
+            android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+            0,
+            text.length,
+            android.text.SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return spannable
     }
 
     private fun observeActiveNote() {
@@ -189,12 +210,14 @@ class LiveUpdateService : Service() {
             putCharSequence("android.shortCriticalText", shortPreview)
         }
 
-        val bigTextStyle = Notification.BigTextStyle()
-            .bigText(note.text)
-            .setBigContentTitle(getString(R.string.app_name))
+        val formattedText = getFormattedLargeText(note.text)
 
-        builder.setContentTitle(getString(R.string.app_name))
-            .setContentText(note.text)
+        val bigTextStyle = Notification.BigTextStyle()
+            .bigText(formattedText)
+            .setBigContentTitle("LUN")
+
+        builder.setContentTitle("LUN")
+            .setContentText(formattedText)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(contentIntent)
             .setDeleteIntent(deleteIntent)
@@ -207,20 +230,6 @@ class LiveUpdateService : Service() {
             .setOnlyAlertOnce(true)
             .setStyle(bigTextStyle)
             .addExtras(extras)
-
-        // Add explicit action button for deactivation
-        val deactivateAction = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Notification.Action.Builder(
-                R.drawable.ic_notification,
-                "Deactivate",
-                deactivateActionIntent
-            ).build()
-        } else {
-            null
-        }
-        if (deactivateAction != null) {
-            builder.addAction(deactivateAction)
-        }
 
         // Apply Android 16 Live Update configurations via compatibility reflection
         applyLiveUpdateCompat(builder, shortPreview)

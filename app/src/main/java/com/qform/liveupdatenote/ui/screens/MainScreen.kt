@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,6 +19,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.qform.liveupdatenote.data.Note
 import com.qform.liveupdatenote.ui.NoteViewModel
+import com.qform.liveupdatenote.ui.ThemeMode
+import kotlinx.coroutines.delay
 
 enum class NavigationTab {
     NOTES, SETTINGS
@@ -47,15 +52,33 @@ fun MainScreen(
     val notes by viewModel.allNotes.collectAsState()
     val activeNote by viewModel.activeNote.collectAsState()
     
+    val currentLanguage by viewModel.language.collectAsState()
+    val isRu = currentLanguage == "ru"
+
     var showAddDialog by remember { mutableStateOf(false) }
     var noteText by remember { mutableStateOf("") }
+    
+    // Focus requester and keyboard summon logic
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(showAddDialog) {
+        if (showAddDialog) {
+            // Tiny delay ensures the dialog window is fully composed and attached
+            delay(100)
+            focusRequester.requestFocus()
+        }
+    }
 
     Scaffold(
         topBar = {
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = if (currentTab == NavigationTab.NOTES) "Live Notes" else "Settings",
+                        text = if (currentTab == NavigationTab.NOTES) {
+                            if (isRu) "Заметки" else "Live Notes"
+                        } else {
+                            if (isRu) "Настройки" else "Settings"
+                        },
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 32.sp
                     )
@@ -74,36 +97,30 @@ fun MainScreen(
                     selected = currentTab == NavigationTab.NOTES,
                     onClick = { currentTab = NavigationTab.NOTES },
                     icon = { Icon(Icons.Default.List, contentDescription = "Notes") },
-                    label = { Text("Notes", fontWeight = FontWeight.Bold) }
+                    label = { Text(if (isRu) "Заметки" else "Notes", fontWeight = FontWeight.Bold) }
                 )
                 NavigationBarItem(
                     selected = currentTab == NavigationTab.SETTINGS,
                     onClick = { currentTab = NavigationTab.SETTINGS },
                     icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                    label = { Text("Settings", fontWeight = FontWeight.Bold) }
+                    label = { Text(if (isRu) "Настройки" else "Settings", fontWeight = FontWeight.Bold) }
                 )
             }
         },
         floatingActionButton = {
             if (currentTab == NavigationTab.NOTES) {
-                ExtendedFloatingActionButton(
+                // Simple plus (+) in a circle FAB
+                FloatingActionButton(
                     onClick = { showAddDialog = true },
-                    shape = RoundedCornerShape(
-                        topStart = 28.dp,
-                        topEnd = 8.dp,
-                        bottomStart = 8.dp,
-                        bottomEnd = 28.dp
-                    ),
+                    shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     elevation = FloatingActionButtonDefaults.elevation(8.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Note")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "New Note",
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
+                    Icon(
+                        imageVector = Icons.Default.Add, 
+                        contentDescription = if (isRu) "Добавить заметку" else "Add Note",
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
@@ -118,7 +135,7 @@ fun MainScreen(
             if (currentTab == NavigationTab.NOTES) {
                 // Notes List Screen
                 Column(modifier = Modifier.fillMaxSize()) {
-                    // Permission warning banner if permission is missing on Android 13+
+                    // Notification permission warning banner
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
                         Card(
                             modifier = Modifier
@@ -143,13 +160,13 @@ fun MainScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Notifications Disabled",
+                                        text = if (isRu) "Уведомления отключены" else "Notifications Disabled",
                                         fontWeight = FontWeight.Bold,
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onErrorContainer
                                     )
                                     Text(
-                                        text = "Live Update notifications require post permission to show on your lockscreen.",
+                                        text = if (isRu) "Разрешите показ уведомлений, чтобы закреплять заметки." else "Live Update notifications require post permission to show on your lockscreen.",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onErrorContainer
                                     )
@@ -163,7 +180,7 @@ fun MainScreen(
                                     ),
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
-                                    Text("Allow", fontWeight = FontWeight.Bold)
+                                    Text(if (isRu) "Разрешить" else "Allow", fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -194,13 +211,13 @@ fun MainScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Live Updates Disabled",
+                                        text = if (isRu) "Продвижение отключено" else "Live Updates Disabled",
                                         fontWeight = FontWeight.Bold,
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onTertiaryContainer
                                     )
                                     Text(
-                                        text = "Live Update system promotion is disabled. Enable it in settings to show status chips and AOD notes.",
+                                        text = if (isRu) "Включите продвижение в настройках для показа заметок на AOD и статус-чипе." else "Live Update system promotion is disabled. Enable it in settings to show status chips and AOD notes.",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onTertiaryContainer
                                     )
@@ -214,7 +231,7 @@ fun MainScreen(
                                     ),
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
-                                    Text("Enable", fontWeight = FontWeight.Bold)
+                                    Text(if (isRu) "Включить" else "Enable", fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -237,14 +254,14 @@ fun MainScreen(
                                     modifier = Modifier.padding(bottom = 16.dp)
                                 )
                                 Text(
-                                    text = "No notes created yet",
+                                    text = if (isRu) "Заметок пока нет" else "No notes created yet",
                                     fontWeight = FontWeight.Bold,
                                     style = MaterialTheme.typography.titleLarge,
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Tap the 'New Note' button below to add your first note.",
+                                    text = if (isRu) "Нажмите на круглую кнопку + внизу, чтобы добавить первую заметку." else "Tap the circular + button below to add your first note.",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.bodyMedium
@@ -271,8 +288,8 @@ fun MainScreen(
                     }
                 }
             } else {
-                // Settings Screen Stub
-                SettingsScreenStub()
+                // Interactive Settings Screen
+                SettingsScreen(viewModel = viewModel, isRu = isRu)
             }
         }
     }
@@ -299,7 +316,7 @@ fun MainScreen(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "Create Note",
+                        text = if (isRu) "Создать заметку" else "Create Note",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
@@ -308,8 +325,10 @@ fun MainScreen(
                     OutlinedTextField(
                         value = noteText,
                         onValueChange = { noteText = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Write your thoughts...") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester), // Focus request target
+                        placeholder = { Text(if (isRu) "Напишите ваши мысли..." else "Write your thoughts...") },
                         maxLines = 6,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -328,7 +347,7 @@ fun MainScreen(
                                 noteText = ""
                             }
                         ) {
-                            Text("Cancel", fontWeight = FontWeight.Bold)
+                            Text(if (isRu) "Отмена" else "Cancel", fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
@@ -341,7 +360,7 @@ fun MainScreen(
                             },
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Save", fontWeight = FontWeight.Bold)
+                            Text(if (isRu) "Сохранить" else "Save", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -357,7 +376,6 @@ fun NoteItemCard(
     onToggleActive: () -> Unit,
     onDelete: () -> Unit
 ) {
-    // Dynamic background color animates based on active state
     val backgroundColor by animateColorAsState(
         targetValue = if (isActive) {
             MaterialTheme.colorScheme.primaryContainer
@@ -380,7 +398,7 @@ fun NoteItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onToggleActive() },
-        shape = RoundedCornerShape(24.dp), // Strong rounded corners (MD3 Expressive)
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor,
             contentColor = contentColor
@@ -395,7 +413,6 @@ fun NoteItemCard(
                 .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Note details
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -409,7 +426,6 @@ fun NoteItemCard(
                 )
             }
 
-            // Delete button
             IconButton(onClick = onDelete) {
                 Icon(
                     imageVector = Icons.Default.Delete,
@@ -425,65 +441,22 @@ fun NoteItemCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreenStub() {
+fun SettingsScreen(
+    viewModel: NoteViewModel,
+    isRu: Boolean
+) {
+    val context = LocalContext.current
+    val currentTheme by viewModel.themeMode.collectAsState()
+    val currentLanguage by viewModel.language.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // App Settings Stub Section
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Preferences",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                
-                // Toggle Item 1
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text("Enable Lockscreen Preview", fontWeight = FontWeight.Bold)
-                        Text("Show full note text on lockscreen", style = MaterialTheme.typography.bodySmall)
-                    }
-                    Switch(checked = true, onCheckedChange = {})
-                }
-                
-                Divider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
-
-                // Toggle Item 2
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text("Vibrate on Active Note Switch", fontWeight = FontWeight.Bold)
-                        Text("Brief vibration when locking active notes", style = MaterialTheme.typography.bodySmall)
-                    }
-                    Switch(checked = false, onCheckedChange = {})
-                }
-            }
-        }
-
-        // System Stub Section
+        // Theme Selection Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
@@ -496,21 +469,153 @@ fun SettingsScreenStub() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "System & Support",
+                    text = if (isRu) "Тема оформления" else "App Theme",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                // Light
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.setThemeMode(ThemeMode.LIGHT) },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = if (isRu) "Светлая" else "Light",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    RadioButton(
+                        selected = currentTheme == ThemeMode.LIGHT,
+                        onClick = { viewModel.setThemeMode(ThemeMode.LIGHT) }
+                    )
+                }
+
+                // Dark
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.setThemeMode(ThemeMode.DARK) },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = if (isRu) "Тёмная" else "Dark",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    RadioButton(
+                        selected = currentTheme == ThemeMode.DARK,
+                        onClick = { viewModel.setThemeMode(ThemeMode.DARK) }
+                    )
+                }
+
+                // System
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.setThemeMode(ThemeMode.SYSTEM) },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = if (isRu) "Как на устройстве" else "System default",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    RadioButton(
+                        selected = currentTheme == ThemeMode.SYSTEM,
+                        onClick = { viewModel.setThemeMode(ThemeMode.SYSTEM) }
+                    )
+                }
+            }
+        }
+
+        // Language Selection Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = if (isRu) "Язык приложения" else "Language",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                // Russian
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.setLanguage(context, "ru") },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Русский",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    RadioButton(
+                        selected = currentLanguage == "ru",
+                        onClick = { viewModel.setLanguage(context, "ru") }
+                    )
+                }
+
+                // English
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.setLanguage(context, "en") },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "English",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    RadioButton(
+                        selected = currentLanguage == "en",
+                        onClick = { viewModel.setLanguage(context, "en") }
+                    )
+                }
+            }
+        }
+
+        // App Info Section
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = if (isRu) "Информация о приложении" else "App Information",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
 
                 ListItem(
-                    headlineContent = { Text("App Version", fontWeight = FontWeight.Bold) },
+                    headlineContent = { Text(if (isRu) "Версия" else "Version", fontWeight = FontWeight.Bold) },
                     supportingContent = { Text("1.0.0 (API 35/36 Live Updates)") },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
 
                 ListItem(
-                    headlineContent = { Text("Database Sync", fontWeight = FontWeight.Bold) },
-                    supportingContent = { Text("Local Room Database - 100% Offline") },
+                    headlineContent = { Text(if (isRu) "База данных" else "Database Sync", fontWeight = FontWeight.Bold) },
+                    supportingContent = { Text(if (isRu) "Локальная БД Room (100% оффлайн)" else "Local Room Database (100% Offline)") },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
             }
