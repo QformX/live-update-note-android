@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
@@ -41,6 +43,11 @@ enum class NavigationTab {
     NOTES, SETTINGS
 }
 
+val NavigationTabSaver = Saver<NavigationTab, String>(
+    save = { it.name },
+    restore = { NavigationTab.valueOf(it) }
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -51,7 +58,7 @@ fun MainScreen(
     onOpenPromotionSettings: () -> Unit
 ) {
     val context = LocalContext.current
-    var currentTab by remember { mutableStateOf(NavigationTab.NOTES) }
+    var currentTab by rememberSaveable(saver = NavigationTabSaver) { mutableStateOf(NavigationTab.NOTES) }
     
     val notes by viewModel.allNotes.collectAsState()
     val activeNote by viewModel.activeNote.collectAsState()
@@ -120,45 +127,45 @@ fun MainScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Mini FAB for Habit Tracker (only visible when expanded)
+                    // Both mini FABs grouped under a single AnimatedVisibility for unified animation
                     AnimatedVisibility(
                         visible = isFabExpanded,
                         enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(expandFrom = Alignment.Bottom),
                         exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically(shrinkTowards = Alignment.Bottom)
                     ) {
-                        SmallFloatingActionButton(
-                            onClick = {
-                                isFabExpanded = false
-                                noteType = "HABIT"
-                                showAddDialog = true
-                            },
-                            shape = CircleShape,
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            modifier = Modifier.size(56.dp)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(28.dp))
-                        }
-                    }
+                            // Mini FAB for Habit Tracker
+                            SmallFloatingActionButton(
+                                onClick = {
+                                    isFabExpanded = false
+                                    noteType = "HABIT"
+                                    showAddDialog = true
+                                },
+                                shape = CircleShape,
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.size(56.dp)
+                            ) {
+                                Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(28.dp))
+                            }
 
-                    // Mini FAB for Regular Note (only visible when expanded)
-                    AnimatedVisibility(
-                        visible = isFabExpanded,
-                        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(expandFrom = Alignment.Bottom),
-                        exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically(shrinkTowards = Alignment.Bottom)
-                    ) {
-                        SmallFloatingActionButton(
-                            onClick = {
-                                isFabExpanded = false
-                                noteType = "TEXT"
-                                showAddDialog = true
-                            },
-                            shape = CircleShape,
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            modifier = Modifier.size(56.dp)
-                        ) {
-                            Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(28.dp))
+                            // Mini FAB for Regular Note
+                            SmallFloatingActionButton(
+                                onClick = {
+                                    isFabExpanded = false
+                                    noteType = "TEXT"
+                                    showAddDialog = true
+                                },
+                                shape = CircleShape,
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.size(56.dp)
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(28.dp))
+                            }
                         }
                     }
 

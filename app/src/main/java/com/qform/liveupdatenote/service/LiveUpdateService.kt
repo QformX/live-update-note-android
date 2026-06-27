@@ -329,9 +329,9 @@ class LiveUpdateService : Service() {
                 setProgressMethod.invoke(progressStyle, progressValue)
 
                 // 2. Set progress tracker icon: .setProgressTrackerIcon(Icon)
-                // Use R.drawable.ic_directions_run (running man vector icon) as the tracker icon
+                // Use R.drawable.ic_f1_car (F1 Car vector icon) as the tracker icon
                 val setProgressTrackerIconMethod = progressStyleClass.getMethod("setProgressTrackerIcon", android.graphics.drawable.Icon::class.java)
-                val trackerIcon = android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_directions_run)
+                val trackerIcon = android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_f1_car)
                 setProgressTrackerIconMethod.invoke(progressStyle, trackerIcon)
 
                 // 3. Set segments: loop through total steps, active steps are colored, remaining are gray

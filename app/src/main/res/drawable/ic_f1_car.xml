@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="50dp"
+    android:viewportWidth="1000"
+    android:viewportHeight="500">
+
+    <!-- F1 Car Left to Right -->
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M120,130 h40 v240 h-40 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M100,110 h30 v60 h-30 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M100,330 h30 v60 h-30 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M130,220 h60 v60 h-60 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M180,160 l80,30 l5,-10 l-80,-30 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M180,340 l80,-30 l5,10 l-80,30 z" />
+        
+    <!-- Rear Tire Left -->
+    <path
+        android:fillColor="#1F2421"
+        android:pathData="M165,60 h70 a15,15 0 0,1 15,15 v50 a15,15 0 0,1 -15,15 h-70 a15,15 0 0,1 -15,-15 v-50 a15,15 0 0,1 15,-15 Z" />
+    <path
+        android:fillColor="#FF9F1C"
+        android:pathData="M160,65 h80 v6 h-80 z" />
+        
+    <!-- Rear Tire Right -->
+    <path
+        android:fillColor="#1F2421"
+        android:pathData="M165,360 h70 a15,15 0 0,1 15,15 v50 a15,15 0 0,1 -15,15 h-70 a15,15 0 0,1 -15,-15 v-50 a15,15 0 0,1 15,-15 Z" />
+    <path
+        android:fillColor="#FF9F1C"
+        android:pathData="M160,429 h80 v6 h-80 z" />
+        
+    <!-- Main Body Red -->
+    <path
+        android:fillColor="#E04A3A"
+        android:pathData="M160,200 c40,-40 120,-60 250,-60 c150,0 350,70 450,110 c-100,40 -300,110 -450,110 c-130,0 -210,-20 -250,-60 z" />
+    <path
+        android:fillColor="#E04A3A"
+        android:pathData="M250,140 c50,-30 120,-20 160,20 c10,10 0,180 -10,190 c-40,40 -110,50 -160,20 z" />
+        
+    <!-- Cockpit and Helmet -->
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M430,215 c20,-15 80,-15 100,0 c10,10 10,60 0,70 c-20,15 -80,15 -100,0 c-10,-10 -10,-60 0,-70 z" />
+    <path
+        android:fillColor="#111111"
+        android:pathData="M 460,232 a 18,18 0 1,1 0,36 a 18,18 0 1,1 0,-36 Z" />
+    <path
+        android:strokeColor="#2C3539"
+        android:strokeWidth="8"
+        android:fillColor="#00000000"
+        android:pathData="M440,250 Q490,220 540,245 L545,250 L540,255 Q490,280 440,250" />
+    <path
+        android:strokeColor="#2C3539"
+        android:strokeWidth="10"
+        android:fillColor="#00000000"
+        android:pathData="M540,250 L570,250" />
+        
+    <!-- Shadows & Details -->
+    <path
+        android:fillColor="#1A1F1D"
+        android:fillAlpha="0.4"
+        android:pathData="M300,240 h130 v20 h-130 z" />
+    <path
+        android:fillColor="#FF9F1C"
+        android:pathData="M 383,246 h 24 a 3,3 0 0 1 3,3 v 2 a 3,3 0 0 1 -3,3 h -24 a 3,3 0 0 1 -3,-3 v -2 a 3,3 0 0 1 3,-3 Z" />
+        
+    <!-- Front Suspensions -->
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M720,230 l40,-80 l10,3 l-40,80 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M720,270 l40,80 l10,-3 l-40,80 z" />
+        
+    <!-- Front Tire Left -->
+    <path
+        android:fillColor="#1F2421"
+        android:pathData="M 742,80 h 66 a 12,12 0 0 1 12,12 v 46 a 12,12 0 0 1 -12,12 h -66 a 12,12 0 0 1 -12,-12 v -46 a 12,12 0 0 1 12,-12 Z" />
+    <path
+        android:fillColor="#FF9F1C"
+        android:pathData="M740,85 h70 v5 h-70 z" />
+        
+    <!-- Front Tire Right -->
+    <path
+        android:fillColor="#1F2421"
+        android:pathData="M 742,350 h 66 a 12,12 0 0 1 12,12 v 46 a 12,12 0 0 1 -12,12 h -66 a 12,12 0 0 1 -12,-12 v -46 a 12,12 0 0 1 12,-12 Z" />
+    <path
+        android:fillColor="#FF9F1C"
+        android:pathData="M740,415 h70 v5 h-70 z" />
+        
+    <!-- Front Nose and Wing -->
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M820,140 l40,30 v160 l-40,30 c10,-40 20,-110 0,-220 z" />
+    <path
+        android:fillColor="#E04A3A"
+        android:pathData="M800,235 l70,5 v20 l-70,5 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M850,150 h50 v20 h-50 z" />
+    <path
+        android:fillColor="#2C3539"
+        android:pathData="M850,330 h50 v20 h-50 z" />
+</vector>
