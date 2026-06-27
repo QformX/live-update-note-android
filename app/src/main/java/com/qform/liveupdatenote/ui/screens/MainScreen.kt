@@ -58,7 +58,7 @@ fun MainScreen(
     onOpenPromotionSettings: () -> Unit
 ) {
     val context = LocalContext.current
-    var currentTab by rememberSaveable(saver = NavigationTabSaver) { mutableStateOf(NavigationTab.NOTES) }
+    var currentTab by rememberSaveable(stateSaver = NavigationTabSaver) { mutableStateOf(NavigationTab.NOTES) }
     
     val notes by viewModel.allNotes.collectAsState()
     val activeNote by viewModel.activeNote.collectAsState()
@@ -805,12 +805,6 @@ fun SettingsScreen(
                 ListItem(
                     headlineContent = { Text(if (isRu) "Версия" else "Version", fontWeight = FontWeight.Bold) },
                     supportingContent = { Text("1.1.0 (API 35/36 Live Updates)") },
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-                )
-
-                ListItem(
-                    headlineContent = { Text(if (isRu) "База данных" else "Database Sync", fontWeight = FontWeight.Bold) },
-                    supportingContent = { Text(if (isRu) "Локальная БД Room (100% оффлайн)" else "Local Room Database (100% Offline)") },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
             }

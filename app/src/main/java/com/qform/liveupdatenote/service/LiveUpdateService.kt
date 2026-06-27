@@ -340,13 +340,20 @@ class LiveUpdateService : Service() {
                 val setColorMethod = segmentClass.getMethod("setColor", Int::class.javaPrimitiveType)
                 val addProgressSegmentMethod = progressStyleClass.getMethod("addProgressSegment", segmentClass)
 
+                val activeColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    getColor(android.R.color.system_accent1_400)
+                } else {
+                    0xFF4CAF50.toInt() // fallback green
+                }
+
+                val inactiveColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    getColor(android.R.color.system_neutral1_500)
+                } else {
+                    0xFF757575.toInt() // fallback gray
+                }
+
                 for (i in 0 until note.totalSteps) {
-                    // Active segments colored Green (0xFF4CAF50), inactive colored Gray (0xFF757575)
-                    val color = if (i < note.currentSteps) {
-                        0xFF4CAF50.toInt() // Completed accent color
-                    } else {
-                        0xFF757575.toInt() // Remaining neutral color
-                    }
+                    val color = if (i < note.currentSteps) activeColor else inactiveColor
                     val segment = segmentConstructor.newInstance(100) // Equal weighting segments of length 100
                     setColorMethod.invoke(segment, color)
                     addProgressSegmentMethod.invoke(progressStyle, segment)

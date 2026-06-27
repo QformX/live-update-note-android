@@ -19,7 +19,7 @@ val DarkOnTertiary = Color(0xFF472A00)
 val DarkTertiaryContainer = Color(0xFF663D00)
 val DarkOnTertiaryContainer = Color(0xFFFFDDB8)
 
-val DarkBackground = Color(0xFF0F0E17) // Ultra-Dark Slate
+val DarkBackground = Color(0xFF1C1A27) // Lighter deep space background
 val DarkOnBackground = Color(0xFFE6E1E5)
 val DarkSurface = Color(0xFF1B1A24) // Slightly lighter container surface
 val DarkOnSurface = Color(0xFFE6E1E5)
