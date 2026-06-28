@@ -16,6 +16,9 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.semantics.*
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -121,75 +124,70 @@ fun MainScreen(
         },
         floatingActionButton = {
             if (currentTab == NavigationTab.NOTES) {
-                var isFabExpanded by remember { mutableStateOf(false) }
+                var isFabExpanded by rememberSaveable { mutableStateOf(false) }
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Both mini FABs grouped under a single AnimatedVisibility for unified animation
-                    AnimatedVisibility(
-                        visible = isFabExpanded,
-                        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(expandFrom = Alignment.Bottom),
-                        exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically(shrinkTowards = Alignment.Bottom)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                androidx.activity.compose.BackHandler(isFabExpanded) {
+                    isFabExpanded = false
+                }
+
+                FloatingActionButtonMenu(
+                    expanded = isFabExpanded,
+                    button = {
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                                if (isFabExpanded) TooltipAnchorPosition.Start else TooltipAnchorPosition.Above
+                            ),
+                            tooltip = {
+                                PlainTooltip(
+                                    modifier = Modifier.semantics {
+                                        liveRegion = LiveRegionMode.Assertive
+                                        paneTitle = if (isRu) "Меню действий" else "Action menu"
+                                    }
+                                ) {
+                                    Text(if (isRu) "Меню действий" else "Action menu")
+                                }
+                            },
+                            state = rememberTooltipState()
                         ) {
-                            // Mini FAB for Habit Tracker
-                            SmallFloatingActionButton(
-                                onClick = {
-                                    isFabExpanded = false
-                                    noteType = "HABIT"
-                                    showAddDialog = true
+                            ToggleFloatingActionButton(
+                                modifier = Modifier.semantics {
+                                    stateDescription = if (isFabExpanded) "Expanded" else "Collapsed"
+                                    contentDescription = if (isRu) "Меню действий" else "Action menu"
                                 },
-                                shape = CircleShape,
-                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                modifier = Modifier.size(56.dp)
+                                checked = isFabExpanded,
+                                onCheckedChange = { isFabExpanded = !isFabExpanded }
                             ) {
-                                Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(28.dp))
-                            }
-
-                            // Mini FAB for Regular Note
-                            SmallFloatingActionButton(
-                                onClick = {
-                                    isFabExpanded = false
-                                    noteType = "TEXT"
-                                    showAddDialog = true
-                                },
-                                shape = CircleShape,
-                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                modifier = Modifier.size(56.dp)
-                            ) {
-                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(28.dp))
+                                val imageVector = if (checkedProgress > 0.5f) Icons.Default.Close else Icons.Default.Add
+                                Icon(
+                                    painter = rememberVectorPainter(imageVector),
+                                    contentDescription = null,
+                                    modifier = Modifier.animateIcon({ checkedProgress })
+                                )
                             }
                         }
                     }
+                ) {
+                    // Regular Note MenuItem
+                    FloatingActionButtonMenuItem(
+                        onClick = {
+                            isFabExpanded = false
+                            noteType = "TEXT"
+                            showAddDialog = true
+                        },
+                        icon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                        text = { Text(text = if (isRu) "Обычная заметка" else "Regular Note") }
+                    )
 
-                    // Main FAB
-                    FloatingActionButton(
-                        onClick = { isFabExpanded = !isFabExpanded },
-                        shape = CircleShape,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        elevation = FloatingActionButtonDefaults.elevation(8.dp),
-                        modifier = Modifier.size(84.dp)
-                    ) {
-                        val rotationAngle by androidx.compose.animation.core.animateFloatAsState(
-                            targetValue = if (isFabExpanded) 45f else 0f,
-                            label = "fab_rotation"
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Add, 
-                            contentDescription = if (isRu) "Добавить" else "Add",
-                            modifier = Modifier
-                                .size(42.dp)
-                                .graphicsLayer(rotationZ = rotationAngle)
-                        )
-                    }
+                    // Habit Tracker MenuItem
+                    FloatingActionButtonMenuItem(
+                        onClick = {
+                            isFabExpanded = false
+                            noteType = "HABIT"
+                            showAddDialog = true
+                        },
+                        icon = { Icon(Icons.Default.Notifications, contentDescription = null) },
+                        text = { Text(text = if (isRu) "Трекер привычек" else "Habit Tracker") }
+                    )
                 }
             }
         }
