@@ -121,6 +121,12 @@ fun MainScreen(
             if (currentTab == NavigationTab.NOTES) {
                 var isFabExpanded by rememberSaveable { mutableStateOf(false) }
 
+                // Cache painters to avoid resource lookups during every animation frame recomposition
+                val addPainter = painterResource(R.drawable.ic_add)
+                val closePainter = painterResource(R.drawable.ic_close)
+                val editPainter = painterResource(R.drawable.ic_edit)
+                val notifPainter = painterResource(R.drawable.ic_notifications)
+
                 androidx.activity.compose.BackHandler(isFabExpanded) {
                     isFabExpanded = false
                 }
@@ -152,9 +158,9 @@ fun MainScreen(
                                 checked = isFabExpanded,
                                 onCheckedChange = { isFabExpanded = !isFabExpanded }
                             ) {
-                                val iconRes = if (checkedProgress > 0.5f) R.drawable.ic_close else R.drawable.ic_add
+                                val iconPainter = if (checkedProgress > 0.5f) closePainter else addPainter
                                 Icon(
-                                    painter = painterResource(iconRes),
+                                    painter = iconPainter,
                                     contentDescription = null,
                                     modifier = Modifier.animateIcon({ checkedProgress })
                                 )
@@ -162,27 +168,43 @@ fun MainScreen(
                         }
                     }
                 ) {
-                    // Regular Note MenuItem
-                    FloatingActionButtonMenuItem(
-                        onClick = {
-                            isFabExpanded = false
-                            noteType = "TEXT"
-                            showAddDialog = true
-                        },
-                        icon = { Icon(painterResource(R.drawable.ic_edit), contentDescription = null) },
-                        text = { Text(text = if (isRu) "Обычная заметка" else "Regular Note") }
-                    )
+                    // Regular Note — icon-only SmallFAB with tooltip
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                        tooltip = { PlainTooltip { Text(if (isRu) "Обычная заметка" else "Regular Note") } },
+                        state = rememberTooltipState()
+                    ) {
+                        SmallFloatingActionButton(
+                            onClick = {
+                                isFabExpanded = false
+                                noteType = "TEXT"
+                                showAddDialog = true
+                            },
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ) {
+                            Icon(painter = editPainter, contentDescription = if (isRu) "Обычная заметка" else "Regular Note")
+                        }
+                    }
 
-                    // Habit Tracker MenuItem
-                    FloatingActionButtonMenuItem(
-                        onClick = {
-                            isFabExpanded = false
-                            noteType = "HABIT"
-                            showAddDialog = true
-                        },
-                        icon = { Icon(painterResource(R.drawable.ic_notifications), contentDescription = null) },
-                        text = { Text(text = if (isRu) "Трекер привычек" else "Habit Tracker") }
-                    )
+                    // Habit Tracker — icon-only SmallFAB with tooltip
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                        tooltip = { PlainTooltip { Text(if (isRu) "Трекер привычек" else "Habit Tracker") } },
+                        state = rememberTooltipState()
+                    ) {
+                        SmallFloatingActionButton(
+                            onClick = {
+                                isFabExpanded = false
+                                noteType = "HABIT"
+                                showAddDialog = true
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ) {
+                            Icon(painter = notifPainter, contentDescription = if (isRu) "Трекер привычек" else "Habit Tracker")
+                        }
+                    }
                 }
             }
         }
