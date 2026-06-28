@@ -2,28 +2,97 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="100"
-    android:viewportHeight="100">
-    <!-- Scaled group to keep the logo inside the Adaptive Icon safe zone (0.72) -->
+    android:viewportWidth="645"
+    android:viewportHeight="645">
     <group
-        android:pivotX="50"
-        android:pivotY="50"
-        android:scaleX="0.72"
-        android:scaleY="0.72">
-        
-        <!-- Thin outer circle outline of the moon -->
-        <path
-            android:fillColor="#00000000"
-            android:strokeColor="#80FFFFFF"
-            android:strokeWidth="3"
-            android:strokeLineCap="round"
-            android:pathData="M 50,10 A 40,40 0 1,1 49.9,10 Z" />
-            
-        <!-- Thick crescent moon body on the left with even-odd cutout craters -->
-        <path
-            android:fillColor="#FFFFFFFF"
-            android:fillType="evenOdd"
-            android:pathData="M 50,10 A 40,40 0 0,0 50,90 A 28,40 0 0,1 50,10 Z M 22,49 A 5,5 0 1,0 21.9,49 Z M 30,32 A 5,5 0 0,0 30,42 A 4,5 0 0,1 30,32 Z M 40,18 A 4,4 0 1,0 39.9,18 Z M 46,15 A 2,2 0 1,0 45.9,15 Z" />
-            
+        android:pivotX="0"
+        android:pivotY="0"
+        android:scaleX="0.95"
+        android:scaleY="0.95"
+        android:translateX="12.947249999999997"
+        android:translateY="12.199600000000032">
+        <group
+            android:pivotX="0"
+            android:pivotY="0"
+            android:rotation="7.094429"
+            android:scaleX="1.000000"
+            android:scaleY="1.000000"
+            android:translateX="-183.176815"
+            android:translateY="-282.917615"
+>
+            <path
+                android:pathData="M430.658,440.377C409.211,476.299 398.303,519.35 401.746,564.439C389.636,567.524 381.474,579.916 383.163,593.486C384.984,608.117 397.573,618.613 411.257,616.91C411.619,616.865 411.977,616.812 412.332,616.751C441.797,704.362 525.32,763.282 616.804,756.197C613.645,756.731 610.459,757.199 607.249,757.598C488.002,772.439 379.167,687.889 364.358,568.905C349.55,449.921 434.34,341.272 553.587,326.431C672.833,311.59 782.259,401.396 797.068,520.38C782.954,425.667 708.504,354.663 619.911,344.76C619.443,354.692 612.732,362.559 604.594,362.5C596.253,362.439 589.532,354.074 589.523,343.792C584.623,344.024 579.698,344.445 574.753,345.061C549.424,348.213 525.82,356.19 504.683,368.001L507.499,389.498C513.296,404.627 510.628,421.473 499.255,432.26C489.276,441.725 474.992,444.251 461.641,440.277L461.737,440.377L430.658,440.377ZM440.128,426.619L439.852,426.313C439.318,427.061 438.789,427.813 438.265,428.569L440.128,426.619ZM460.286,396.072C452.494,404.5 451.355,416.139 457.744,422.047C464.133,427.954 475.647,425.909 483.44,417.481C491.232,409.053 492.372,397.415 485.982,391.507C479.593,385.599 468.079,387.645 460.286,396.072Z"
+            >
+                <gradient
+                    android:type="linear"
+                    android:startX="529.358963"
+                    android:startY="349.212960"
+                    android:endX="1072.283949"
+                    android:endY="850.893749">
+                    <item android:offset="0.000000" android:color="#FFEBEBEB"/>
+                    <item android:offset="1.000000" android:color="#FFA3A3A3"/>
+                </gradient>
+            </path>
+        </group>
+        <group
+            android:pivotX="0"
+            android:pivotY="0"
+            android:rotation="144.118852"
+            android:scaleX="1.511364"
+            android:scaleY="1.020813"
+            android:translateX="1019.769592"
+            android:translateY="427.643056"
+>
+            <path
+                android:pathData="M436.885,540C432.505,542.929 428.949,549.796 428.949,557.575C428.949,565.354 432.505,572.22 436.885,575.149C428.125,575.149 421.013,567.274 421.013,557.575C421.013,547.875 428.125,540 436.885,540Z"
+                android:fillColor="#FFEBEBEB"
+            >
+            </path>
+        </group>
+        <group
+            android:pivotX="0"
+            android:pivotY="0"
+            android:rotation="-147.632221"
+            android:scaleX="1.831722"
+            android:scaleY="1.818671"
+            android:translateX="352.669296"
+            android:translateY="1549.856757"
+>
+            <path
+                android:pathData="M436.885,540C432.505,542.929 428.949,549.796 428.949,557.575C428.949,565.354 432.505,572.22 436.885,575.149C428.125,575.149 421.013,567.274 421.013,557.575C421.013,547.875 428.125,540 436.885,540Z"
+                android:fillColor="#FFEBEBEB"
+            >
+            </path>
+        </group>
+        <group
+            android:pivotX="0"
+            android:pivotY="0"
+            android:rotation="-98.520388"
+            android:scaleX="1.763584"
+            android:scaleY="1.191847"
+            android:translateX="-227.485367"
+            android:translateY="1015.175978"
+>
+            <path
+                android:pathData="M436.885,540C431.635,542.348 427.374,549.414 427.374,557.575C427.374,565.735 431.635,572.802 436.885,575.149C428.125,575.149 421.013,567.274 421.013,557.575C421.013,547.875 428.125,540 436.885,540Z"
+                android:fillColor="#FFEBEBEB"
+            >
+            </path>
+        </group>
+        <group
+            android:pivotX="0"
+            android:pivotY="0"
+            android:rotation="0.000000"
+            android:scaleX="1.000000"
+            android:scaleY="1.259259"
+            android:translateX="-249.485922"
+            android:translateY="-386.944443"
+>
+            <path
+                android:pathData="M793.005,570.863C793.047,569.467 793.005,572.267 793.005,570.863Z"
+                android:fillColor="#5BEBEBEB"
+            >
+            </path>
+        </group>
     </group>
 </vector>
