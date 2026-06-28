@@ -7,10 +7,10 @@
     <group
         android:pivotX="0"
         android:pivotY="0"
-        android:scaleX="0.95"
-        android:scaleY="0.95"
-        android:translateX="12.947249999999997"
-        android:translateY="12.199600000000032">
+        android:scaleX="0.6"
+        android:scaleY="0.6"
+        android:translateX="126.993"
+        android:translateY="126.521">
         <group
             android:pivotX="0"
             android:pivotY="0"

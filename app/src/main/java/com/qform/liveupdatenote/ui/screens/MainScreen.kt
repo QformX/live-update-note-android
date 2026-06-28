@@ -16,10 +16,12 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.semantics.*
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -51,7 +53,7 @@ val NavigationTabSaver = Saver<NavigationTab, String>(
     restore = { NavigationTab.valueOf(it) }
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainScreen(
     viewModel: NoteViewModel,
@@ -809,3 +811,4 @@ fun SettingsScreen(
         }
     }
 }
+
