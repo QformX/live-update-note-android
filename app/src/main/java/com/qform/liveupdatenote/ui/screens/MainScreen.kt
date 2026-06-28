@@ -9,19 +9,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.semantics.*
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import com.qform.liveupdatenote.R
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -115,12 +108,12 @@ fun MainScreen(
                 NavigationBarItem(
                     selected = currentTab == NavigationTab.NOTES,
                     onClick = { currentTab = NavigationTab.NOTES },
-                    icon = { Icon(Icons.Default.List, contentDescription = "Notes") }
+                    icon = { Icon(painterResource(R.drawable.ic_list), contentDescription = "Notes") }
                 )
                 NavigationBarItem(
                     selected = currentTab == NavigationTab.SETTINGS,
                     onClick = { currentTab = NavigationTab.SETTINGS },
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") }
+                    icon = { Icon(painterResource(R.drawable.ic_settings), contentDescription = "Settings") }
                 )
             }
         },
@@ -159,9 +152,9 @@ fun MainScreen(
                                 checked = isFabExpanded,
                                 onCheckedChange = { isFabExpanded = !isFabExpanded }
                             ) {
-                                val imageVector = if (checkedProgress > 0.5f) Icons.Default.Close else Icons.Default.Add
+                                val iconRes = if (checkedProgress > 0.5f) R.drawable.ic_close else R.drawable.ic_add
                                 Icon(
-                                    painter = rememberVectorPainter(imageVector),
+                                    painter = painterResource(iconRes),
                                     contentDescription = null,
                                     modifier = Modifier.animateIcon({ checkedProgress })
                                 )
@@ -176,7 +169,7 @@ fun MainScreen(
                             noteType = "TEXT"
                             showAddDialog = true
                         },
-                        icon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                        icon = { Icon(painterResource(R.drawable.ic_edit), contentDescription = null) },
                         text = { Text(text = if (isRu) "Обычная заметка" else "Regular Note") }
                     )
 
@@ -187,7 +180,7 @@ fun MainScreen(
                             noteType = "HABIT"
                             showAddDialog = true
                         },
-                        icon = { Icon(Icons.Default.Notifications, contentDescription = null) },
+                        icon = { Icon(painterResource(R.drawable.ic_notifications), contentDescription = null) },
                         text = { Text(text = if (isRu) "Трекер привычек" else "Habit Tracker") }
                     )
                 }
@@ -221,7 +214,7 @@ fun MainScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Notifications,
+                                    painter = painterResource(R.drawable.ic_notifications),
                                     contentDescription = "Notifications",
                                     tint = MaterialTheme.colorScheme.onErrorContainer
                                 )
@@ -272,7 +265,7 @@ fun MainScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Notifications,
+                                    painter = painterResource(R.drawable.ic_notifications),
                                     contentDescription = "Live Updates Disabled",
                                     tint = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
@@ -552,7 +545,7 @@ fun NoteItemCard(
 
                 IconButton(onClick = onDelete) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        painter = painterResource(R.drawable.ic_delete),
                         contentDescription = "Delete Note",
                         tint = if (isActive) {
                             MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
