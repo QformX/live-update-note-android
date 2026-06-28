@@ -3,12 +3,16 @@ package com.qform.liveupdatenote.ui.screens
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.material3.*
 import androidx.compose.ui.semantics.*
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
@@ -168,43 +172,27 @@ fun MainScreen(
                         }
                     }
                 ) {
-                    // Regular Note — icon-only SmallFAB with tooltip
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
-                        tooltip = { PlainTooltip { Text(if (isRu) "Обычная заметка" else "Regular Note") } },
-                        state = rememberTooltipState()
-                    ) {
-                        SmallFloatingActionButton(
-                            onClick = {
-                                isFabExpanded = false
-                                noteType = "TEXT"
-                                showAddDialog = true
-                            },
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ) {
-                            Icon(painter = editPainter, contentDescription = if (isRu) "Обычная заметка" else "Regular Note")
-                        }
-                    }
+                    // Regular Note — icon-only FAB menu item
+                    FloatingActionButtonMenuItem(
+                        onClick = {
+                            isFabExpanded = false
+                            noteType = "TEXT"
+                            showAddDialog = true
+                        },
+                        icon = { Icon(painter = editPainter, contentDescription = null) },
+                        text = {}
+                    )
 
-                    // Habit Tracker — icon-only SmallFAB with tooltip
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
-                        tooltip = { PlainTooltip { Text(if (isRu) "Трекер привычек" else "Habit Tracker") } },
-                        state = rememberTooltipState()
-                    ) {
-                        SmallFloatingActionButton(
-                            onClick = {
-                                isFabExpanded = false
-                                noteType = "HABIT"
-                                showAddDialog = true
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        ) {
-                            Icon(painter = notifPainter, contentDescription = if (isRu) "Трекер привычек" else "Habit Tracker")
-                        }
-                    }
+                    // Habit Tracker — icon-only FAB menu item
+                    FloatingActionButtonMenuItem(
+                        onClick = {
+                            isFabExpanded = false
+                            noteType = "HABIT"
+                            showAddDialog = true
+                        },
+                        icon = { Icon(painter = notifPainter, contentDescription = null) },
+                        text = {}
+                    )
                 }
             }
         }
@@ -595,20 +583,10 @@ fun NoteItemCard(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                val progressFraction = if (note.totalSteps > 0) {
-                    note.currentSteps.toFloat() / note.totalSteps
-                } else {
-                    0f
-                }
-
-                LinearProgressIndicator(
-                    progress = { progressFraction },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                SegmentedHabitProgress(
+                    currentSteps = note.currentSteps,
+                    totalSteps = note.totalSteps,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -647,6 +625,40 @@ fun NoteItemCard(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SegmentedHabitProgress(
+    currentSteps: Int,
+    totalSteps: Int,
+    modifier: Modifier = Modifier
+) {
+    if (totalSteps <= 0) return
+
+    val completedGreen = Color(0xFF4CAF50)
+    val incompleteColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+    val segmentGap = if (totalSteps > 20) 2.dp else 3.dp
+    val segmentHeight = if (totalSteps > 20) 8.dp else 10.dp
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(segmentGap)
+    ) {
+        for (i in 0 until totalSteps) {
+            val isCompleted = i < currentSteps
+            val segmentColor by animateColorAsState(
+                targetValue = if (isCompleted) completedGreen else incompleteColor,
+                label = "habit_seg_$i"
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(segmentHeight)
+                    .clip(RoundedCornerShape(50))
+                    .background(segmentColor)
+            )
         }
     }
 }
